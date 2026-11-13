@@ -1,0 +1,612 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Controle de Comandas</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f2f5f2;color:#17231d;font-family:Arial,sans-serif;padding-bottom:30px}
+header{background:#10251e;color:white;padding:22px 16px}
+header h2{margin:0 0 5px}
+header p{margin:0;color:#c8d8cf;font-size:13px}
+main{max-width:600px;margin:auto;padding:14px}
+nav{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:15px}
+nav button{padding:13px 5px;border:0;border-radius:10px;background:white;color:#176b48;font-weight:bold}
+nav button.active{background:#176b48;color:white}
+section{display:none}
+section.active{display:block}
+.card{background:white;border-radius:13px;padding:15px;margin-bottom:12px;border:1px solid #e1e8e2}
+button{cursor:pointer}
+.btn{border:0;border-radius:10px;padding:12px;background:#176b48;color:white;font-weight:bold;font-size:15px}
+.full{width:100%;margin-top:8px}
+.secondary{background:#e7f4ec;color:#176b48}
+input,select{width:100%;padding:12px;border:1px solid #ccd7ce;border-radius:9px;font-size:16px;background:white}
+label{display:block;margin:12px 0 5px;font-size:13px;color:#66736b}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.muted{font-size:13px;color:#66736b}
+.big{font-size:24px;font-weight:bold}
+.product-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.product{padding:15px;background:white;border:1px solid #dce5dd;border-radius:12px;text-align:left}
+.product strong,.product span{display:block}
+.product span{font-size:13px;color:#66736b;margin-top:5px}
+.item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #e1e8e2;gap:8px}
+.qty{display:flex;align-items:center;gap:10px}
+.qty button{width:32px;height:32px;border:0;border-radius:8px;background:#e7f4ec;color:#176b48;font-size:20px}
+.pill{background:#fff3d6;color:#8a5a00;padding:5px 8px;border-radius:20px;font-size:11px}
+.paid{background:#e7f4ec;color:#176b48}
+.hidden{display:none}
+.stat{background:#e7f4ec;padding:13px;border-radius:10px;flex:1}
+.empty{text-align:center;color:#66736b;padding:20px}
+#status{font-size:13px;margin:10px 0;color:#53645a}
+#login{max-width:440px;margin:18px auto}
+</style>
+</head>
+<body>
+
+<header>
+<h2>🍺 Controle de Comandas</h2>
+<p>Controle suas vendas de bebidas</p>
+</header>
+
+<main>
+
+<div id="login" class="card hidden">
+<strong>Acessar suas comandas</strong>
+<p class="muted">Entre com o e-mail e a senha cadastrados no Supabase.</p>
+<label>E-mail</label>
+<input id="email" type="email" placeholder="seuemail@exemplo.com">
+<label>Senha</label>
+<input id="senha" type="password" placeholder="Sua senha">
+<button class="btn full" onclick="entrar()">Entrar</button>
+<div id="loginErro" class="muted"></div>
+</div>
+
+<div id="app" class="hidden">
+
+<div class="row" style="margin-bottom:10px">
+<div class="muted" id="usuarioLogado"></div>
+<button class="btn secondary" onclick="sair()">Sair</button>
+</div>
+
+<nav>
+<button class="active" onclick="aba('comandas',this)">Comandas</button>
+<button onclick="aba('relatorio',this)">Relatório</button>
+<button onclick="aba('precos',this)">Preços</button>
+</nav>
+
+<section id="comandas" class="active">
+<div class="row" style="margin-bottom:12px">
+<div>
+<div class="muted">Comandas abertas</div>
+<div class="big" id="abertas">0</div>
+</div>
+<button class="btn" onclick="novaComanda()">+ Nova</button>
+</div>
+
+<div id="formNova" class="card hidden">
+<strong>Nova comanda</strong>
+<label>Nome do cliente</label>
+<input id="nomeCliente" placeholder="Digite o nome">
+<button class="btn full" onclick="abrirComanda()">Abrir comanda</button>
+<button class="btn secondary full" onclick="cancelarNova()">Cancelar</button>
+</div>
+
+<div id="lista"></div>
+<div id="editor" class="card hidden"></div>
+</section>
+
+<section id="relatorio">
+<div class="card">
+<strong>Vendas do dia</strong>
+<label>Escolha a data</label>
+<input type="date" id="dataRelatorio" onchange="relatorio()">
+<div class="row" style="margin-top:12px">
+<div class="stat">
+<div class="muted">Total vendido</div>
+<div class="big" id="totalDia">R$ 0,00</div>
+</div>
+<div class="stat">
+<div class="muted">Comandas pagas</div>
+<div class="big" id="qtdPagas">0</div>
+</div>
+</div>
+<div class="item"><span>Pix</span><strong id="totalPix">R$ 0,00</strong></div>
+<div class="item"><span>Dinheiro</span><strong id="totalDinheiro">R$ 0,00</strong></div>
+</div>
+
+<div class="card">
+<strong>Vendas por bebida</strong>
+<div id="vendasProdutos"></div>
+</div>
+
+<div class="card">
+<strong>Fim de semana</strong>
+<label>Escolha o sábado</label>
+<input type="date" id="sabado" onchange="relatorio()">
+<div class="big" id="totalFimSemana">R$ 0,00</div>
+</div>
+</section>
+
+<section id="precos">
+<div class="card">
+<strong>Preços das bebidas</strong>
+<label>Cerveja (R$)</label>
+<input type="number" id="precoCerveja" min="0" step="0.01">
+<label>Água (R$)</label>
+<input type="number" id="precoAgua" min="0" step="0.01">
+<label>Refrigerante (R$)</label>
+<input type="number" id="precoRefri" min="0" step="0.01">
+<button class="btn full" onclick="salvarPrecos()">Salvar preços</button>
+</div>
+
+<div class="card">
+<strong>Backup dos dados</strong>
+<p class="muted">Baixe uma cópia das comandas salvas na nuvem.</p>
+<button class="btn secondary full" onclick="backup()">Baixar backup</button>
+</div>
+</section>
+</div>
+
+<div id="status">Conectando...</div>
+</main>
+
+<script>
+const SUPABASE_URL="https://jvnlnrjkjolsnkiclllo.supabase.co";
+const SUPABASE_KEY="sb_publishable_B3C5hzMzUXhsOA82ehAI5A_XIfImP43";
+
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const produtos=["Cerveja","Agua","Refri"];
+
+let usuario=null;
+let banco={precos:{Cerveja:0,Agua:0,Refri:0},produtos:{},comandas:[]};
+let atual=null;
+
+function aviso(msg,erro=false){
+let e=document.getElementById("status");
+e.textContent=msg;
+e.style.color=erro?"#b42318":"#53645a";
+}
+
+function dinheiro(v){
+return Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+}
+
+function dataHoje(){
+let d=new Date();
+return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+
+function esc(t){
+return String(t).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+
+function mostrarLogin(){
+document.getElementById("login").classList.remove("hidden");
+document.getElementById("app").classList.add("hidden");
+aviso("Entre para acessar suas comandas.");
+}
+
+function mostrarApp(){
+document.getElementById("login").classList.add("hidden");
+document.getElementById("app").classList.remove("hidden");
+document.getElementById("usuarioLogado").textContent=usuario.email;
+}
+
+async function entrar(){
+let email=document.getElementById("email").value.trim();
+let password=document.getElementById("senha").value;
+
+if(!email||!password){
+alert("Informe e-mail e senha.");
+return;
+}
+
+let {data,error}=await sb.auth.signInWithPassword({email,password});
+
+if(error){
+alert("Erro no login: "+error.message);
+return;
+}
+
+usuario=data.user;
+await carregarDados();
+}
+
+async function sair(){
+await sb.auth.signOut();
+usuario=null;
+atual=null;
+mostrarLogin();
+}
+
+async function carregarDados(){
+if(!usuario)return;
+
+mostrarApp();
+aviso("Carregando dados...");
+
+try{
+let {data:lista,error}=await sb.from("products")
+.select("*").eq("user_id",usuario.id);
+
+if(error)throw error;
+
+let faltantes=produtos.filter(p=>!lista.some(x=>x.name===p));
+
+if(faltantes.length){
+let {error}=await sb.from("products").insert(
+faltantes.map(name=>({
+user_id:usuario.id,
+name:name,
+price:0,
+active:true
+}))
+);
+if(error)throw error;
+
+let r=await sb.from("products").select("*").eq("user_id",usuario.id);
+if(r.error)throw r.error;
+lista=r.data;
+}
+
+banco.produtos={};
+
+for(let p of lista){
+if(produtos.includes(p.name)){
+banco.produtos[p.name]=p;
+banco.precos[p.name]=Number(p.price)||0;
+}
+}
+
+let {data:orders,error:e2}=await sb.from("orders")
+.select("*, order_items(*)")
+.eq("user_id",usuario.id)
+.order("created_at",{ascending:false});
+
+if(e2)throw e2;
+
+banco.comandas=(orders||[]).map(o=>{
+let itens={};
+
+for(let i of (o.order_items||[])){
+itens[i.product_name]={
+qtd:Number(i.quantity),
+preco:Number(i.unit_price)
+};
+}
+
+return {
+id:o.id,
+nome:o.customer_name,
+itens:itens,
+status:o.status==="paid"?"paga":"aberta",
+criada:o.created_at,
+pagamento:o.payment_method,
+pagaEm:o.paid_at
+};
+});
+
+mostrar();
+relatorio();
+aviso("Dados sincronizados com sucesso.");
+
+}catch(e){
+aviso("Erro: "+e.message,true);
+alert("Erro ao carregar: "+e.message);
+}
+}
+
+function aba(id,b){
+document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+b.classList.add("active");
+if(id==="relatorio")relatorio();
+}
+
+function novaComanda(){
+document.getElementById("formNova").classList.remove("hidden");
+document.getElementById("nomeCliente").focus();
+}
+
+function cancelarNova(){
+document.getElementById("formNova").classList.add("hidden");
+}
+
+async function abrirComanda(){
+let nome=document.getElementById("nomeCliente").value.trim();
+
+if(!nome){
+alert("Digite o nome do cliente.");
+return;
+}
+
+let {data,error}=await sb.from("orders").insert({
+user_id:usuario.id,
+customer_name:nome,
+status:"open"
+}).select().single();
+
+if(error){
+alert("Erro: "+error.message);
+return;
+}
+
+document.getElementById("nomeCliente").value="";
+cancelarNova();
+await carregarDados();
+editar(data.id);
+}
+
+function total(c){
+return Object.values(c.itens).reduce((s,i)=>s+i.qtd*i.preco,0);
+}
+
+function editar(id){
+atual=id;
+let c=banco.comandas.find(x=>x.id===id);
+if(!c)return;
+
+let e=document.getElementById("editor");
+e.classList.remove("hidden");
+
+let h='<div class="row"><strong>Comanda - '+esc(c.nome)+'</strong><button class="btn secondary" onclick="fecharEditor()">Fechar</button></div>';
+
+if(c.status==="aberta"){
+h+='<h3>Adicionar bebida</h3><div class="product-grid">';
+
+for(let p of produtos){
+let n=p==="Agua"?"Água":p==="Refri"?"Refrigerante":p;
+h+='<button class="product" onclick="adicionar(\''+p+'\')"><strong>+ '+n+'</strong><span>'+dinheiro(banco.precos[p])+' cada</span></button>';
+}
+
+h+='</div>';
+}
+
+h+='<h3>Consumo</h3>';
+
+let itens=Object.entries(c.itens);
+
+if(!itens.length)h+='<div class="empty">Nenhuma bebida adicionada.</div>';
+
+for(let [p,i] of itens){
+let n=p==="Agua"?"Água":p==="Refri"?"Refrigerante":p;
+
+h+='<div class="item"><div><strong>'+n+'</strong><div class="muted">'+dinheiro(i.preco)+' cada</div><div>'+dinheiro(i.qtd*i.preco)+'</div></div>';
+
+if(c.status==="aberta"){
+h+='<div class="qty"><button onclick="quantidade(\''+p+'\',-1)">−</button><strong>'+i.qtd+'</strong><button onclick="quantidade(\''+p+'\',1)">+</button></div>';
+}else{
+h+='<strong>'+i.qtd+' un.</strong>';
+}
+
+h+='</div>';
+}
+
+h+='<div class="row" style="padding:15px 0"><strong>Total</strong><div class="big">'+dinheiro(total(c))+'</div></div>';
+
+if(c.status==="aberta"){
+h+='<label>Forma de pagamento</label><select id="pagamento"><option>Pix</option><option>Dinheiro</option></select><button class="btn full" onclick="pagar(\''+c.id+'\')" '+(total(c)<=0?"disabled":"")+'>Fechar comanda e marcar como pago</button>';
+}else{
+h+='<span class="pill paid">PAGO - '+esc(c.pagamento||"")+'</span>';
+}
+
+e.innerHTML=h;
+}
+
+async function salvarItem(c,p,qtd,preco){
+if(qtd<=0){
+let {error}=await sb.from("order_items").delete()
+.eq("order_id",c.id)
+.eq("user_id",usuario.id)
+.eq("product_name",p);
+if(error)throw error;
+}else{
+let {error}=await sb.from("order_items").upsert({
+user_id:usuario.id,
+order_id:c.id,
+product_name:p,
+quantity:qtd,
+unit_price:preco
+},{onConflict:"order_id,user_id,product_name"});
+if(error)throw error;
+}
+}
+
+async function adicionar(p){
+let c=banco.comandas.find(x=>x.id===atual);
+if(!c||c.status!=="aberta")return;
+
+let i=c.itens[p]||{qtd:0,preco:Number(banco.precos[p])};
+
+try{
+await salvarItem(c,p,i.qtd+1,i.preco);
+await carregarDados();
+editar(c.id);
+}catch(e){
+alert("Erro ao adicionar: "+e.message);
+}
+}
+
+async function quantidade(p,n){
+let c=banco.comandas.find(x=>x.id===atual);
+if(!c||!c.itens[p])return;
+
+let i=c.itens[p];
+
+try{
+await salvarItem(c,p,i.qtd+n,i.preco);
+await carregarDados();
+editar(c.id);
+}catch(e){
+alert("Erro ao atualizar: "+e.message);
+}
+}
+
+async function pagar(id){
+let c=banco.comandas.find(x=>x.id===id);
+if(!c||total(c)<=0)return;
+
+if(!confirm("Confirmar recebimento de "+dinheiro(total(c))+"?"))return;
+
+let {error}=await sb.from("orders").update({
+status:"paid",
+payment_method:document.getElementById("pagamento").value,
+paid_at:new Date().toISOString()
+}).eq("id",id).eq("user_id",usuario.id);
+
+if(error){
+alert("Erro ao fechar comanda: "+error.message);
+return;
+}
+
+await carregarDados();
+editar(id);
+}
+
+function fecharEditor(){
+atual=null;
+document.getElementById("editor").classList.add("hidden");
+}
+
+function mostrar(){
+document.getElementById("abertas").textContent=
+banco.comandas.filter(c=>c.status==="aberta").length;
+
+let l=document.getElementById("lista");
+
+l.innerHTML=banco.comandas.length?
+banco.comandas.map(c=>'<button class="card" style="width:100%;text-align:left;border:1px solid #ddd" onclick="editar(\''+c.id+'\')"><div class="row"><div><strong>'+esc(c.nome)+'</strong><div class="muted">Comanda</div></div><div style="text-align:right"><span class="pill '+(c.status==="paga"?"paid":"")+'">'+(c.status==="paga"?"Paga":"Em aberto")+'</span><div style="font-weight:bold;margin-top:7px">'+dinheiro(total(c))+'</div></div></div></button>').join("")
+:'<div class="card empty">Nenhuma comanda cadastrada.</div>';
+
+document.getElementById("precoCerveja").value=banco.precos.Cerveja;
+document.getElementById("precoAgua").value=banco.precos.Agua;
+document.getElementById("precoRefri").value=banco.precos.Refri;
+
+if(atual&&banco.comandas.some(c=>c.id===atual))editar(atual);
+}
+
+async function salvarPrecos(){
+let novos={
+Cerveja:Number(document.getElementById("precoCerveja").value)||0,
+Agua:Number(document.getElementById("precoAgua").value)||0,
+Refri:Number(document.getElementById("precoRefri").value)||0
+};
+
+for(let p of produtos){
+let prod=banco.produtos[p];
+if(!prod){alert("Produto não encontrado: "+p);return;}
+
+let {error}=await sb.from("products").update({
+price:novos[p]
+}).eq("id",prod.id).eq("user_id",usuario.id);
+
+if(error){
+alert("Erro ao salvar preços: "+error.message);
+return;
+}
+}
+
+await carregarDados();
+alert("Preços salvos na nuvem!");
+}
+
+function relatorio(){
+if(!usuario)return;
+
+let data=document.getElementById("dataRelatorio").value||dataHoje();
+document.getElementById("dataRelatorio").value=data;
+
+let pagas=banco.comandas.filter(c=>
+c.status==="paga"&&c.pagaEm&&c.pagaEm.slice(0,10)===data
+);
+
+let soma=pagas.reduce((s,c)=>s+total(c),0);
+
+document.getElementById("totalDia").textContent=dinheiro(soma);
+document.getElementById("qtdPagas").textContent=pagas.length;
+
+document.getElementById("totalPix").textContent=dinheiro(
+pagas.filter(c=>c.pagamento==="Pix").reduce((s,c)=>s+total(c),0)
+);
+
+document.getElementById("totalDinheiro").textContent=dinheiro(
+pagas.filter(c=>c.pagamento==="Dinheiro").reduce((s,c)=>s+total(c),0)
+);
+
+let h="";
+
+for(let p of produtos){
+let q=pagas.reduce((s,c)=>s+(c.itens[p]?.qtd||0),0);
+let v=pagas.reduce((s,c)=>s+(c.itens[p]?.qtd||0)*(c.itens[p]?.preco||0),0);
+let n=p==="Agua"?"Água":p==="Refri"?"Refrigerante":p;
+h+='<div class="item"><span>'+n+' - '+q+' unidades</span><strong>'+dinheiro(v)+'</strong></div>';
+}
+
+document.getElementById("vendasProdutos").innerHTML=h;
+
+let sab=document.getElementById("sabado").value||data;
+document.getElementById("sabado").value=sab;
+
+let d=new Date(sab+"T12:00:00");
+let dif=d.getDay()===6?0:d.getDay()===0?-1:6-d.getDay();
+let ini=new Date(d);
+ini.setDate(d.getDate()-dif);
+
+let fim=new Date(ini);
+fim.setDate(ini.getDate()+1);
+
+let a=ini.getFullYear()+"-"+String(ini.getMonth()+1).padStart(2,"0")+"-"+String(ini.getDate()).padStart(2,"0");
+let b=fim.getFullYear()+"-"+String(fim.getMonth()+1).padStart(2,"0")+"-"+String(fim.getDate()).padStart(2,"0");
+
+let totalFim=banco.comandas.filter(c=>
+c.status==="paga"&&c.pagaEm&&[a,b].includes(c.pagaEm.slice(0,10))
+).reduce((s,c)=>s+total(c),0);
+
+document.getElementById("totalFimSemana").textContent=dinheiro(totalFim);
+}
+
+function backup(){
+let arquivo=new Blob([JSON.stringify(banco,null,2)],{type:"application/json"});
+let url=URL.createObjectURL(arquivo);
+let a=document.createElement("a");
+a.href=url;
+a.download="backup-comandas.json";
+a.click();
+URL.revokeObjectURL(url);
+}
+
+async function iniciar(){
+document.getElementById("dataRelatorio").value=dataHoje();
+document.getElementById("sabado").value=dataHoje();
+
+let {data,error}=await sb.auth.getSession();
+
+if(error){
+mostrarLogin();
+aviso(error.message,true);
+return;
+}
+
+if(data.session){
+usuario=data.session.user;
+await carregarDados();
+}else{
+mostrarLogin();
+}
+}
+
+sb.auth.onAuthStateChange((event,session)=>{
+if(event==="SIGNED_OUT"){
+usuario=null;
+mostrarLogin();
+}
+});
+
+iniciar();
+</script>
+</body>
+</html>
