@@ -353,8 +353,8 @@ if(!c)return;
 let e=document.getElementById("editor");
 e.classList.remove("hidden");
 
-let h='<div class="row"><strong>Comanda - '+esc(c.nome)+'</strong><button class="btn secondary" onclick="fecharEditor()">Fechar</button></div';
-    
+let h='<div class="row"><strong>Comanda - '+esc(c.nome)+'</strong><button class="btn secondary" onclick="fecharEditor()">Fechar</button></div>';
+
 if(c.status==="aberta"){
 h+='<button class="btn full" style="background:#b42318" onclick="excluirComanda(\''+c.id+'\')">🗑️ Excluir comanda</button>';
 }
