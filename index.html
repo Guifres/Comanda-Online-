@@ -353,7 +353,11 @@ if(!c)return;
 let e=document.getElementById("editor");
 e.classList.remove("hidden");
 
-let h='<div class="row"><strong>Comanda - '+esc(c.nome)+'</strong><button class="btn secondary" onclick="fecharEditor()">Fechar</button></div>';
+let h='<div class="row"><strong>Comanda - '+esc(c.nome)+'</strong><button class="btn secondary" onclick="fecharEditor()">Fechar</button></div';
+    
+if(c.status==="aberta"){
+h+='<button class="btn full" style="background:#b42318" onclick="excluirComanda(\''+c.id+'\')">🗑️ Excluir comanda</button>';
+}
 
 if(c.status==="aberta"){
 h+='<h3>Adicionar bebida</h3><div class="product-grid">';
@@ -465,7 +469,39 @@ return;
 
 await carregarDados();
 editar(id);
+}async function excluirComanda(id){
+let c=banco.comandas.find(x=>x.id===id);
+
+if(!c || c.status!=="aberta"){
+alert("Só é permitido excluir comandas abertas.");
+return;
 }
+
+if(!confirm("Tem certeza que deseja excluir a comanda de "+c.nome+"? Essa ação não poderá ser desfeita.")){
+return;
+}
+
+let {error}=await sb.from("orders")
+.delete()
+.eq("id",id)
+.eq("user_id",usuario.id)
+.eq("status","open");
+
+if(error){
+alert("Erro ao excluir: "+error.message);
+return;
+}
+
+atual=null;
+document.getElementById("editor").classList.add("hidden");
+
+await carregarDados();
+
+alert("Comanda excluída com sucesso!");
+}
+
+
+
 
 function fecharEditor(){
 atual=null;
