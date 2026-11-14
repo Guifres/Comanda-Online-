@@ -553,7 +553,7 @@ let abertas=banco.comandas.filter(c=>c.status==="aberta");
 let finalizadas=banco.comandas.filter(c=>c.status==="paga")
 
 function montarLista(lista){
-    return lista.length
+    return lista.length?
     lista.map(c=>'<button class="card" style="width:100%;text-align:left;border:1px solid #ddd" onclick="editar(\''+c.id+'\')"><div class="row"><div><strong>'+esc(c.nome)+'</strong><div class="muted">Comanda</div></div><div style="text-align:right"><span class="pill '+(c.status==="paga"?"paid":"")+'">'+(c.status==="paga"?"Paga":"Em aberto")+'</span><div style="font-weight:bold;margin-top:7px">'+dinheiro(total(c))+'</div></div></div></button>').join("");'<div class="card empty">Nenhuma comanda encontrada.</div>';
 }
 
