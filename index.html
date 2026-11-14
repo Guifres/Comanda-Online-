@@ -561,10 +561,6 @@ l.innerHTML=montasLista(abertas);
 
 document,getElementById("listaFinalizadas").innerHTML=montasLista(finalizadas);
 
-l.innerHTML=banco.comandas.length?
-banco.comandas.map(c=>'<button class="card" style="width:100%;text-align:left;border:1px solid #ddd" onclick="editar(\''+c.id+'\')"><div class="row"><div><strong>'+esc(c.nome)+'</strong><div class="muted">Comanda</div></div><div style="text-align:right"><span class="pill '+(c.status==="paga"?"paid":"")+'">'+(c.status==="paga"?"Paga":"Em aberto")+'</span><div style="font-weight:bold;margin-top:7px">'+dinheiro(total(c))+'</div></div></div></button>').join("")
-:'<div class="card empty">Nenhuma comanda cadastrada.</div>';
-
 document.getElementById("precoCerveja").value=banco.precos.Cerveja;
 document.getElementById("precoAgua").value=banco.precos.Agua;
 document.getElementById("precoRefri").value=banco.precos.Refri;
