@@ -72,9 +72,10 @@ label{display:block;margin:12px 0 5px;font-size:13px;color:#66736b}
 </div>
 
 <nav>
-<button class="active" onclick="aba('comandas',this)">Comandas</button>
-<button onclick="aba('relatorio',this)">Relatório</button>
-<button onclick="aba('precos',this)">Preços</button>
+    <button class="active" onclick="aba('comandas', this)">Abertas</button>
+    <button onclick="aba('finalizadas', this)">Finalizadas</button>
+    <button onclick="aba('relatorio', this)">Relatorio</button>
+    <button onclick="aba('precos', this)">Preços</button>
 </nav>
 
 <section id="comandas" class="active">
@@ -96,6 +97,20 @@ label{display:block;margin:12px 0 5px;font-size:13px;color:#66736b}
 
 <div id="lista"></div>
 <div id="editor" class="card hidden"></div>
+</section>
+
+<section id="finalizadas">
+    <div class="card">
+        <strong>
+            Comandas Finalizadas
+        </strong>
+        <p class="muted">
+            Consulte aqui as vendas que já foram pagas.
+        </p>
+    </div>
+    <div id="listaFinalizadas">
+
+    </div>
 </section>
 
 <section id="relatorio">
@@ -533,6 +548,18 @@ document.getElementById("abertas").textContent=
 banco.comandas.filter(c=>c.status==="aberta").length;
 
 let l=document.getElementById("lista");
+
+let abertas=banco.comandas.filter(c=>c.status==="aberta");
+let finalizadas=banco.comandas.filter(c=>c.status==="paga")
+
+function montasLista(lista){
+    return lista.length
+    lista.map(c=>'<button class="card" style="width:100%;text-align:left;border:1px solid #ddd" onclick="editar(\''+c.id+'\')"><div class="row"><div><strong>'+esc(c.nome)+'</strong><div class="muted">Comanda</div></div><div style="text-align:right"><span class="pill '+(c.status==="paga"?"paid":"")+'">'+(c.status==="paga"?"Paga":"Em aberto")+'</span><div style="font-weight:bold;margin-top:7px">'+dinheiro(total(c))+'</div></div></div></button>').join("");'<div class="card empty">Nenhuma comanda encontrada.</div>';
+}
+
+l.innerHTML=montasLista(abertas);
+
+document,getElementById("listaFinalizadas").innerHTML=montasLista(finalizadas);
 
 l.innerHTML=banco.comandas.length?
 banco.comandas.map(c=>'<button class="card" style="width:100%;text-align:left;border:1px solid #ddd" onclick="editar(\''+c.id+'\')"><div class="row"><div><strong>'+esc(c.nome)+'</strong><div class="muted">Comanda</div></div><div style="text-align:right"><span class="pill '+(c.status==="paga"?"paid":"")+'">'+(c.status==="paga"?"Paga":"Em aberto")+'</span><div style="font-weight:bold;margin-top:7px">'+dinheiro(total(c))+'</div></div></div></button>').join("")
