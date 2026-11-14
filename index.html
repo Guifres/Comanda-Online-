@@ -543,23 +543,23 @@ atual=null;
 document.getElementById("editor").classList.add("hidden");
 }
 
+
 function mostrar(){
 document.getElementById("abertas").textContent=
 banco.comandas.filter(c=>c.status==="aberta").length;
 
-let l=document.getElementById("lista");
-
 let abertas=banco.comandas.filter(c=>c.status==="aberta");
-let finalizadas=banco.comandas.filter(c=>c.status==="paga")
+let finalizadas=banco.comandas.filter(c=>c.status==="paga");
 
 function montarLista(lista){
-    return lista.length?
-    lista.map(c=>'<button class="card" style="width:100%;text-align:left;border:1px solid #ddd" onclick="editar(\''+c.id+'\')"><div class="row"><div><strong>'+esc(c.nome)+'</strong><div class="muted">Comanda</div></div><div style="text-align:right"><span class="pill '+(c.status==="paga"?"paid":"")+'">'+(c.status==="paga"?"Paga":"Em aberto")+'</span><div style="font-weight:bold;margin-top:7px">'+dinheiro(total(c))+'</div></div></div></button>').join("");'<div class="card empty">Nenhuma comanda encontrada.</div>';
+return lista.length?
+lista.map(c=>'<button class="card" style="width:100%;text-align:left;border:1px solid #ddd" onclick="editar(\''+c.id+'\')"><div class="row"><div><strong>'+esc(c.nome)+'</strong><div class="muted">Comanda</div></div><div style="text-align:right"><span class="pill '+(c.status==="paga"?"paid":"")+'">'+(c.status==="paga"?"Paga":"Em aberto")+'</span><div style="font-weight:bold;margin-top:7px">'+dinheiro(total(c))+'</div></div></div></button>').join("")
+:'<div class="card empty">Nenhuma comanda encontrada.</div>';
 }
 
-l.innerHTML=montarLista(abertas);
+document.getElementById("lista").innerHTML=montarLista(abertas);
 
-document.getElementById("listaFinalizadas").innerHTML=montarlista(finalizadas);
+document.getElementById("listaFinalizadas").innerHTML=montarLista(finalizadas);
 
 document.getElementById("precoCerveja").value=banco.precos.Cerveja;
 document.getElementById("precoAgua").value=banco.precos.Agua;
@@ -567,6 +567,7 @@ document.getElementById("precoRefri").value=banco.precos.Refri;
 
 if(atual&&banco.comandas.some(c=>c.id===atual))editar(atual);
 }
+
 
 async function salvarPrecos(){
 let novos={
