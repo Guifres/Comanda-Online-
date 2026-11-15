@@ -644,7 +644,7 @@ let data=document.getElementById("dataRelatorio").value||dataHoje();
 document.getElementById("dataRelatorio").value=data;
 
 let pagas=banco.comandas.filter(c=>
-c.status==="paga"&&c.pagaEm&&dataLocal(c.pagaEm)===data
+c.status==="paga"&&c.criada&&dataLocal(c.criada)===data
 );
 
 let soma=pagas.reduce((s,c)=>s+total(c),0);
@@ -703,7 +703,7 @@ let a=ini.getFullYear()+"-"+String(ini.getMonth()+1).padStart(2,"0")+"-"+String(
 let b=fim.getFullYear()+"-"+String(fim.getMonth()+1).padStart(2,"0")+"-"+String(fim.getDate()).padStart(2,"0");
 
 let totalFim=banco.comandas.filter(c=>
-c.status==="paga"&&c.pagaEm&&[a,b].includes(dataLocal(c.pagaEm))
+c.status==="paga"&&c.criada&&[a,b].includes(dataLocal(c.criada))
 ).reduce((s,c)=>s+total(c),0);
 
 document.getElementById("totalFimSemana").textContent=dinheiro(totalFim);
