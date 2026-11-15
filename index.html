@@ -196,6 +196,17 @@ let d=new Date();
 return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 }
 
+function formatarData(data){
+if(!data)return "";
+return new Date(data).toLocaleString("pt-BR",{
+day:"2-digit",
+month:"2-digit",
+year:"numeric",
+hour:"2-digit",
+minute:"2-digit"
+});
+}
+
 function esc(t){
 return String(t).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
 }
@@ -371,6 +382,8 @@ let e=document.getElementById("editor");
 e.classList.remove("hidden");
 
 let h='<div class="row"><strong>Comanda - '+esc(c.nome)+'</strong><button class="btn secondary" onclick="fecharEditor()">Fechar</button></div>';
+
+h+='<div class="muted" style="margin-top:8px">Criada em: '+formatarData(c.criada)+'</div>';
 
 if(c.status==="aberta"){
 h+='<button class="btn full" style="background:#b42318" onclick="excluirComanda(\''+c.id+'\')">🗑️ Excluir comanda</button>';
@@ -555,7 +568,7 @@ let finalizadas=banco.comandas.filter(c=>c.status==="paga");
 
 function montarLista(lista){
 return lista.length?
-lista.map(c=>'<button class="card" style="width:100%;text-align:left;border:1px solid #ddd" onclick="editar(\''+c.id+'\')"><div class="row"><div><strong>'+esc(c.nome)+'</strong><div class="muted">Comanda</div></div><div style="text-align:right"><span class="pill '+(c.status==="paga"?"paid":"")+'">'+(c.status==="paga"?"Paga":"Em aberto")+'</span><div style="font-weight:bold;margin-top:7px">'+dinheiro(total(c))+'</div></div></div></button>').join("")
+lista.map(c=>'<button class="card" style="width:100%;text-align:left;border:1px solid #ddd" onclick="editar(\''+c.id+'\')"><div class="row"><div><strong>'+esc(c.nome)+'</strong><div class="muted">Criada: '+formatarData(c.criada)+'</div></div><div style="text-align:right"><span class="pill '+(c.status==="paga"?"paid":"")+'">'+(c.status==="paga"?"Paga":"Em aberto")+'</span><div style="font-weight:bold;margin-top:7px">'+dinheiro(total(c))+'</div></div></div></button>').join("")
 :'<div class="card empty">Nenhuma comanda encontrada.</div>';
 }
 
