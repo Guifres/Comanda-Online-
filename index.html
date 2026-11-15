@@ -192,19 +192,30 @@ return Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 }
 
 function dataHoje(){
-let d=new Date();
-return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+return new Intl.DateTimeFormat("en-CA",{
+timeZone:"America/Sao_Paulo",
+year:"numeric",
+month:"2-digit",
+day:"2-digit"
+}).format(new Date());
 }
-
 
 function dataLocal(data){
 if(!data)return "";
-let d=new Date(data);
-return d.getFullYear()+"-"+
-String(d.getMonth()+1).padStart(2,"0")+"-"+
-String(d.getDate()).padStart(2,"0");
-}
 
+let partes=new Intl.DateTimeFormat("en-CA",{
+timeZone:"America/Sao_Paulo",
+year:"numeric",
+month:"2-digit",
+day:"2-digit"
+}).formatToParts(new Date(data));
+
+let ano=partes.find(p=>p.type==="year").value;
+let mes=partes.find(p=>p.type==="month").value;
+let dia=partes.find(p=>p.type==="day").value;
+
+return ano+"-"+mes+"-"+dia;
+}
 
 function formatarData(data){
 if(!data)return "";
