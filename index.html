@@ -116,6 +116,13 @@ label{display:block;margin:12px 0 5px;font-size:13px;color:#66736b}
 </section>
 
 <section id="relatorio">
+    <div class="card">
+        <strong>
+            Comandas incluidas neste relatorio
+        </strong>
+        <div id="listaVendasDia">
+        </div>
+    </div>
 <div class="card">
 <strong>Vendas do dia</strong>
 <label>Escolha a data</label>
@@ -641,6 +648,23 @@ c.status==="paga"&&c.pagaEm&&dataLocal(c.pagaEm)===data
 );
 
 let soma=pagas.reduce((s,c)=>s+total(c),0);
+
+
+let listaVendas=document.getElementById("listaVendasDia");
+
+listaVendas.innerHTML=pagas.length?
+pagas.map(c=>`
+<div class="item">
+<div>
+<strong>${esc(c.nome)}</strong>
+<div class="muted">Criada: ${formatarData(c.criada)}</div>
+<div class="muted">Paga: ${formatarData(c.pagaEm)}</div>
+</div>
+<strong>${dinheiro(total(c))}</strong>
+</div>
+`).join("")
+:'<div class="empty">Nenhuma comanda paga nesta data.</div>';
+
 
 document.getElementById("totalDia").textContent=dinheiro(soma);
 document.getElementById("qtdPagas").textContent=pagas.length;
