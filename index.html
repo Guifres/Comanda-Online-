@@ -147,6 +147,25 @@ label{display:block;margin:12px 0 5px;font-size:13px;color:#66736b}
 </div>
 
 <div class="card">
+<strong>Lucro do dia</strong>
+
+<div class="item">
+<span>Custo das bebidas</span>
+<strong id="custoDia">R$ 0,00</strong>
+</div>
+
+<div class="item">
+<span>Lucro bruto</span>
+<strong id="lucroDia">R$ 0,00</strong>
+</div>
+
+<hr>
+
+<strong>Lucro por bebida</strong>
+<div id="lucroPorBebida"></div>
+</div>
+
+<div class="card">
 <strong>Fim de semana</strong>
 <label>Escolha o sábado</label>
 <input type="date" id="sabado" onchange="relatorio()">
@@ -183,6 +202,11 @@ const SUPABASE_KEY="sb_publishable_B3C5hzMzUXhsOA82ehAI5A_XIfImP43";
 
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const produtos=["Cerveja","Agua","Refri"];
+const custos={
+Cerveja:4.58,
+Agua:1.00,
+Refri:3.91
+};
 
 let usuario=null;
 let banco={precos:{Cerveja:0,Agua:0,Refri:0},produtos:{},comandas:[]};
@@ -687,6 +711,38 @@ h+='<div class="item"><span>'+n+' - '+q+' unidades</span><strong>'+dinheiro(v)+'
 }
 
 document.getElementById("vendasProdutos").innerHTML=h;
+
+let custoTotal=0;
+let lucroHtml="";
+
+for(let p of produtos){
+let q=pagas.reduce((s,c)=>s+(c.itens[p]?.qtd||0),0);
+
+let vendido=pagas.reduce(
+(s,c)=>s+(c.itens[p]?.qtd||0)*(c.itens[p]?.preco||0),0
+);
+
+let custo=q* custos[p];
+let lucro=vendido-custo;
+
+custoTotal+=custo;
+
+let n=p==="Agua"?"Água":p==="Refri"?"Refrigerante":p;
+
+lucroHtml+=`
+<div class="item">
+<div>
+<strong>${n}</strong>
+<div class="muted">Vendido: ${dinheiro(vendido)} | Custo: ${dinheiro(custo)}</div>
+</div>
+<strong>${dinheiro(lucro)}</strong>
+</div>
+`;
+}
+
+document.getElementById("custoDia").textContent=dinheiro(custoTotal);
+document.getElementById("lucroDia").textContent=dinheiro(soma-custoTotal);
+document.getElementById("lucroPorBebida").innerHTML=lucroHtml;
 
 let sab=document.getElementById("sabado").value||data;
 document.getElementById("sabado").value=sab;
