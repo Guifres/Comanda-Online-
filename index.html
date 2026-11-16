@@ -728,7 +728,10 @@ let vendido=pagas.reduce(
 (s,c)=>s+(c.itens[p]?.qtd||0)*(c.itens[p]?.preco||0),0
 );
 
-let custo=q* custos[p];
+let custo=pagas.reduce((s,c)=>
+ s+(c.itens[p]?.qtd||0)*(c.itens[p]?.custo ?? custos[p]),0
+);
+
 let lucro=vendido-custo;
 
 custoTotal+=custo;
