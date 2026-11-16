@@ -518,6 +518,7 @@ document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"))
 document.getElementById(id).classList.add("active");
 b.classList.add("active");
 if(id==="relatorio")relatorio();
+if(id==="caixa")fechamentoCaixa();
 }
 
 function novaComanda(){
@@ -1020,6 +1021,36 @@ c.status==="paga"&&c.criada&&[a,b].includes(dataLocal(c.criada))
 ).reduce((s,c)=>s+totalCentavos(c),0);
 
 document.getElementById("totalFimSemana").textContent=dinheiroCentavos(totalFim);
+}
+
+function fechamentoCaixa(){
+
+    let data=document.getElementById("dataCaixa").value||dataHoje();
+
+    document.getElementById("dataCaixa").value=data;
+
+    let recebidas=banco.comandas.filter(c=>
+        c.status==="paga"&&
+        c.pagaEm&&
+        dataLocal(c.pagaEm)===data
+    );
+
+    let pix=recebidas
+        .filter(c=>c.pagamento==="Pix")
+        .reduce((s,c)=>s+totalCentavos(c),0);
+
+    let dinheiroRecebido=recebidas
+        .filter(c=>c.pagamento==="Dinheiro")
+        .reduce((s,c)=>s+totalCentavos(c),0);
+
+    let totalRecebido=recebidas
+        .reduce((s,c)=>s+totalCentavos(c),0);
+
+    document.getElementById("caixaPix").textContent=dinheiroCentavos(pix);
+
+    document.getElementById("caixaDinheiro").textContent=dinheiroCentavos(dinheiroRecebido);
+
+    document.getElementById("caixaTotal").textContent=dinheiroCentavos(totalRecebido);
 }
 
 function backup(){
