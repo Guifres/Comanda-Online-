@@ -234,24 +234,33 @@ label{display:block;margin:12px 0 5px;font-size:13px;color:#66736b}
 
 
 <section id="precos">
-<div class="card">
-<strong>Preços das bebidas</strong>
-<label>Cerveja (R$)</label>
-<input type="number" id="precoCerveja" min="0" step="0.01">
-<label>Água (R$)</label>
-<input type="number" id="precoAgua" min="0" step="0.01">
-<label>Refrigerante (R$)</label>
-<input type="number" id="precoRefri" min="0" step="0.01">
-<button class="btn full" onclick="salvarPrecos()">Salvar preços</button>
-</div>
 
-<div class="card">
-<strong>Backup dos dados</strong>
-<p class="muted">Baixe uma cópia das comandas salvas na nuvem.</p>
-<button class="btn secondary full" onclick="backup()">Baixar backup</button>
-</div>
+<section id="precos">
+
+    <details class="card report-card">
+        <summary>Preços das bebidas</summary>
+
+        <label>Cerveja (R$)</label>
+        <input type="number" id="precoCerveja" min="0" step="0.01">
+
+        <label>Água (R$)</label>
+        <input type="number" id="precoAgua" min="0" step="0.01">
+
+        <label>Refrigerante (R$)</label>
+        <input type="number" id="precoRefri" min="0" step="0.01">
+
+        <button class="btn full" onclick="salvarPrecos()">Salvar preços</button>
+    </details>
+
+    <details class="card report-card">
+        <summary>Backup dos dados</summary>
+
+        <p class="muted">Baixe uma cópia das comandas salvas na nuvem.</p>
+
+        <button class="btn secondary full" onclick="backup()">Baixar backup</button>
+    </details>
+
 </section>
-</div>
 
 <div id="status">Conectando...</div>
 </main>
