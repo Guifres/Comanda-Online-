@@ -353,8 +353,9 @@ let itens={};
 
 for(let i of (o.order_items||[])){
 itens[i.product_name]={
-qtd:Number(i.quantity),
-preco:Number(i.unit_price)
+ qtd:Number(i.quantity),
+ preco:Number(i.unit_price),
+ custo:Number(i.unit_cost ?? custos[i.product_name] ?? 0)
 };
 }
 
@@ -483,7 +484,7 @@ h+='<span class="pill paid">PAGO - '+esc(c.pagamento||"")+'</span>';
 e.innerHTML=h;
 }
 
-async function salvarItem(c,p,qtd,preco){
+async function salvarItem(c,p,qtd,preco,custo){
 if(qtd<=0){
 let {error}=await sb.from("order_items").delete()
 .eq("order_id",c.id)
@@ -496,7 +497,8 @@ user_id:usuario.id,
 order_id:c.id,
 product_name:p,
 quantity:qtd,
-unit_price:preco
+unit_price:preco,
+unit_cost:custo
 },{onConflict:"order_id,user_id,product_name"});
 if(error)throw error;
 }
