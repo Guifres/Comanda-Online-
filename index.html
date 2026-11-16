@@ -758,13 +758,13 @@ for(let dia of datasOrdenadas){
     let quantidade=gruposFinalizadas[dia].length;
 
     let totalDia=gruposFinalizadas[dia].reduce(
-        (s,c)=>s+total(c),0
-    );
+    (s,c)=>s+totalCentavos(c),0
+);
 
     htmlFinalizadas+=`
         <details class="card report-card">
             <summary>
-                ${dataFormatada} — ${quantidade} comandas — ${dinheiro(totalDia)}
+                ${dataFormatada} — ${quantidade} comandas — ${dinheiroCentavos(totalDia)}
             </summary>
 
             ${montarLista(gruposFinalizadas[dia])}
