@@ -737,7 +737,7 @@ document.getElementById("lista").innerHTML=montarLista(abertas);
 let gruposFinalizadas={};
 
 for(let c of finalizadas){
-    let dia=dataLocal(c.pagaEm||c.criada);
+    let dia=dataLocal(c.criada);
 
     if(!gruposFinalizadas[dia]){
         gruposFinalizadas[dia]=[];
