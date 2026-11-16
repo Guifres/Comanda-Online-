@@ -707,7 +707,48 @@ lista.map(c=>'<button class="card" style="width:100%;text-align:left;border:1px 
 
 document.getElementById("lista").innerHTML=montarLista(abertas);
 
-document.getElementById("listaFinalizadas").innerHTML=montarLista(finalizadas);
+
+let gruposFinalizadas={};
+
+for(let c of finalizadas){
+    let dia=dataLocal(c.pagaEm||c.criada);
+
+    if(!gruposFinalizadas[dia]){
+        gruposFinalizadas[dia]=[];
+    }
+
+    gruposFinalizadas[dia].push(c);
+}
+
+let htmlFinalizadas="";
+
+let datasOrdenadas=Object.keys(gruposFinalizadas).sort().reverse();
+
+for(let dia of datasOrdenadas){
+
+    let partes=dia.split("-");
+    let dataFormatada=partes[2]+"/"+partes[1]+"/"+partes[0];
+
+    let quantidade=gruposFinalizadas[dia].length;
+
+    let totalDia=gruposFinalizadas[dia].reduce(
+        (s,c)=>s+total(c),0
+    );
+
+    htmlFinalizadas+=`
+        <details class="card report-card">
+            <summary>
+                ${dataFormatada} — ${quantidade} comandas — ${dinheiro(totalDia)}
+            </summary>
+
+            ${montarLista(gruposFinalizadas[dia])}
+        </details>
+    `;
+}
+
+document.getElementById("listaFinalizadas").innerHTML=
+    htmlFinalizadas||'<div class="card empty">Nenhuma comanda finalizada.</div>';
+
 
 document.getElementById("precoCerveja").value=banco.precos.Cerveja;
 document.getElementById("precoAgua").value=banco.precos.Agua;
