@@ -138,90 +138,100 @@ label{display:block;margin:12px 0 5px;font-size:13px;color:#66736b}
     </div>
 </section>
 
+
 <section id="relatorio">
+
     <details class="card report-card">
         <summary>Comandas incluídas neste relatório</summary>
+        <div id="listaVendasDia"></div>
     </details>
 
-<div class="card">
-<strong>Vendas do dia</strong>
-<label>Escolha a data</label>
-<input type="date" id="dataRelatorio" onchange="relatorio()">
-<div class="row" style="margin-top:12px">
-<div class="stat">
-<div class="muted">Total vendido</div>
-<div class="big" id="totalDia">R$ 0,00</div>
-</div>
-<div class="stat">
-<div class="muted">Comandas pagas</div>
-<div class="big" id="qtdPagas">0</div>
-</div>
-</div>
-<div class="item"><span>Pix</span><strong id="totalPix">R$ 0,00</strong></div>
-<div class="item"><span>Dinheiro</span><strong id="totalDinheiro">R$ 0,00</strong></div>
-</div>
+    <details class="card report-card">
+        <summary>Vendas do dia</summary>
 
-<details class="card report-card">
-<summary>Vendas por bebida</summary>
-<div id="vendasProdutos"></div>
-</details>
+        <label>Escolha a data</label>
+        <input type="date" id="dataRelatorio" onchange="relatorio()">
 
-<div class="card">
-<strong>Lucro do dia</strong>
+        <div class="row" style="margin-top:12px">
+            <div class="stat">
+                <div class="muted">Total vendido</div>
+                <div class="big" id="totalDia">R$ 0,00</div>
+            </div>
+            <div class="stat">
+                <div class="muted">Comandas pagas</div>
+                <div class="big" id="qtdPagas">0</div>
+            </div>
+        </div>
 
-<div class="item">
-<span>Custo das bebidas</span>
-<strong id="custoDia">R$ 0,00</strong>
-</div>
+        <div class="item"><span>Pix</span><strong id="totalPix">R$ 0,00</strong></div>
+        <div class="item"><span>Dinheiro</span><strong id="totalDinheiro">R$ 0,00</strong></div>
+    </details>
 
-<div class="item">
-<span>Lucro bruto</span>
-<strong id="lucroDia">R$ 0,00</strong>
-</div>
+    <details class="card report-card">
+        <summary>Vendas por bebida</summary>
+        <div id="vendasProdutos"></div>
+    </details>
 
-<hr>
+    <details class="card report-card">
+        <summary>Lucro do dia</summary>
 
-<strong>Lucro por bebida</strong>
+        <div class="item">
+            <span>Custo das bebidas</span>
+            <strong id="custoDia">R$ 0,00</strong>
+        </div>
 
-<div id="lucroPorBebida"></div>
-</div>
+        <div class="item">
+            <span>Lucro bruto</span>
+            <strong id="lucroDia">R$ 0,00</strong>
+        </div>
 
-<div class="card">
-<strong>Despesas do dia</strong>
-<p class="muted">Registre gelo, copos e outros gastos.</p>
+        <hr>
 
-<label>Descrição da despesa</label>
-<input id="descricaoDespesa" placeholder="Ex.: Gelo">
+        <strong>Lucro por bebida</strong>
+        <div id="lucroPorBebida"></div>
+    </details>
 
-<label>Valor gasto (R$)</label>
-<input id="valorDespesa" type="number" min="0.01" step="0.01" placeholder="Ex.: 20,00">
+    <details class="card report-card">
+        <summary>Despesas e lucro final</summary>
 
-<button class="btn full" onclick="adicionarDespesa()">Registrar despesa</button>
+        <p class="muted">Registre gelo, copos e outros gastos.</p>
 
-<hr>
+        <label>Descrição da despesa</label>
+        <input id="descricaoDespesa" placeholder="Ex.: Gelo">
 
-<strong>Despesas registradas</strong>
-<div id="listaDespesas"></div>
+        <label>Valor gasto (R$)</label>
+        <input id="valorDespesa" type="number" min="0.01" step="0.01" placeholder="Ex.: 20,00">
 
-<div class="item">
-<strong>Total de despesas</strong>
-<strong id="totalDespesas">R$ 0,00</strong>
-</div>
+        <button class="btn full" onclick="adicionarDespesa()">Registrar despesa</button>
 
-<div class="item">
-<strong>Lucro final após despesas</strong>
-<strong id="lucroFinal">R$ 0,00</strong>
-</div>
-</div>
+        <hr>
 
-<div class="card">
-<strong>Fim de semana</strong>
+        <strong>Despesas registradas</strong>
+        <div id="listaDespesas"></div>
 
-<label>Escolha o sábado</label>
-<input type="date" id="sabado" onchange="relatorio()">
-<div class="big" id="totalFimSemana">R$ 0,00</div>
-</div>
+        <div class="item">
+            <strong>Total de despesas</strong>
+            <strong id="totalDespesas">R$ 0,00</strong>
+        </div>
+
+        <div class="item">
+            <strong>Lucro final após despesas</strong>
+            <strong id="lucroFinal">R$ 0,00</strong>
+        </div>
+    </details>
+
+    <details class="card report-card">
+        <summary>Vendas do final de semana</summary>
+
+        <label>Escolha o sábado</label>
+        <input type="date" id="sabado" onchange="relatorio()">
+
+        <div class="big" id="totalFimSemana">R$ 0,00</div>
+        <p class="muted">Total vendido no sábado e no domingo.</p>
+    </details>
+
 </section>
+
 
 <section id="precos">
 <div class="card">
