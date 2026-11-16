@@ -42,6 +42,29 @@ label{display:block;margin:12px 0 5px;font-size:13px;color:#66736b}
 .empty{text-align:center;color:#66736b;padding:20px}
 #status{font-size:13px;margin:10px 0;color:#53645a}
 #login{max-width:440px;margin:18px auto}
+.report-card summary{
+    cursor:pointer;
+    font-weight:bold;
+    padding:3px 0;
+    list-style:none;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.report-card summary::after{
+    content:"+";
+    font-size:22px;
+    color:#176b48;
+}
+
+.report-card[open] summary::after{
+    content:"−";
+}
+
+.report-card summary::-webkit-details-marker{
+    display:none;
+}
 </style>
 </head>
 <body>
@@ -116,13 +139,10 @@ label{display:block;margin:12px 0 5px;font-size:13px;color:#66736b}
 </section>
 
 <section id="relatorio">
-    <div class="card">
-        <strong>
-            Comandas incluidas neste relatorio
-        </strong>
-        <div id="listaVendasDia">
-        </div>
-    </div>
+    <details class="card report-card">
+        <summary>Comandas incluídas neste relatório</summary>
+    </details>
+
 <div class="card">
 <strong>Vendas do dia</strong>
 <label>Escolha a data</label>
@@ -876,7 +896,7 @@ let sab=document.getElementById("sabado").value||data;
 document.getElementById("sabado").value=sab;
 
 let d=new Date(sab+"T12:00:00");
-let dif=d.getDay()===6?0:d.getDay()===0?-1:6-d.getDay();
+let dif=d.getDay()===6?0:d.getDay()===0?1:6-d.getDay();
 let ini=new Date(d);
 ini.setDate(d.getDate()-dif);
 
