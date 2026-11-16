@@ -261,6 +261,13 @@ label{display:block;margin:12px 0 5px;font-size:13px;color:#66736b}
             <strong class="big" id="caixaTotal">R$ 0,00</strong>
         </div>
     </div>
+    <div class="card">
+    <strong>Detalhamento dos recebimentos</strong>
+
+    <div id="listaRecebimentos">
+        <p class="muted">Nenhum recebimento nesta data.</p>
+    </div>
+</div>
 
 </section>
 
@@ -1051,6 +1058,33 @@ function fechamentoCaixa(){
     document.getElementById("caixaDinheiro").textContent=dinheiroCentavos(dinheiroRecebido);
 
     document.getElementById("caixaTotal").textContent=dinheiroCentavos(totalRecebido);
+    let lista=document.getElementById("listaRecebimentos");
+
+if(recebidas.length===0){
+
+    lista.innerHTML='<p class="muted">Nenhum recebimento nesta data.</p>';
+
+}else{
+
+    lista.innerHTML=recebidas.map(c=>`
+
+        <div class="item">
+            <div>
+                <strong>${c.nome}</strong>
+                <div class="muted">
+                    Abertura: ${dataLocal(c.criada)}
+                </div>
+                <div class="muted">
+                    Pagamento: ${c.pagamento}
+                </div>
+            </div>
+
+            <strong>${dinheiroCentavos(totalCentavos(c))}</strong>
+        </div>
+
+    `).join("");
+
+}
 }
 
 function backup(){
