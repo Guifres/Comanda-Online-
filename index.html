@@ -303,6 +303,25 @@ day:"2-digit"
 }).format(new Date());
 }
 
+
+function centavos(valor){
+    return Math.round((Number(valor)||0)*100);
+}
+
+function dinheiroCentavos(valor){
+    return (valor/100).toLocaleString("pt-BR",{
+        style:"currency",
+        currency:"BRL"
+    });
+}
+
+function totalCentavos(c){
+    return Object.values(c.itens).reduce(
+        (s,i)=>s+i.qtd*centavos(i.preco),0
+    );
+}
+
+
 function dataLocal(data){
 if(!data)return "";
 
@@ -505,7 +524,7 @@ editar(data.id);
 }
 
 function total(c){
-return Object.values(c.itens).reduce((s,i)=>s+i.qtd*i.preco,0);
+    return totalCentavos(c)/100;
 }
 
 function editar(id){
@@ -852,12 +871,12 @@ let pagas=banco.comandas.filter(c=>
 c.status==="paga"&&c.criada&&dataLocal(c.criada)===data
 );
 
-let soma=pagas.reduce((s,c)=>s+total(c),0);
+let soma=pagas.reduce((s,c)=>s+totalCentavos(c),0);
 
 let despesasDia=banco.despesas.filter(d=>d.expense_date===data);
 
 let totalDespesas=despesasDia.reduce(
-    (s,d)=>s+Number(d.amount),0
+    (s,d)=>s+centavos(d.amount),0
 );
 
 
@@ -877,24 +896,26 @@ pagas.map(c=>`
 :'<div class="empty">Nenhuma comanda paga nesta data.</div>';
 
 
-document.getElementById("totalDia").textContent=dinheiro(soma);
+document.getElementById("totalDia").textContent=dinheiroCentavos(soma);
 document.getElementById("qtdPagas").textContent=pagas.length;
 
-document.getElementById("totalPix").textContent=dinheiro(
-pagas.filter(c=>c.pagamento==="Pix").reduce((s,c)=>s+total(c),0)
+document.getElementById("totalPix").textContent=dinheiroCentavos(
+pagas.filter(c=>c.pagamento==="Pix").reduce((s,c)=>s+totalCentavos(c),0)
 );
 
-document.getElementById("totalDinheiro").textContent=dinheiro(
-pagas.filter(c=>c.pagamento==="Dinheiro").reduce((s,c)=>s+total(c),0)
+document.getElementById("totalDinheiro").textContent=dinheiroCentavos(
+pagas.filter(c=>c.pagamento==="Dinheiro").reduce((s,c)=>s+totalCentavos(c),0)
 );
 
 let h="";
 
 for(let p of produtos){
 let q=pagas.reduce((s,c)=>s+(c.itens[p]?.qtd||0),0);
-let v=pagas.reduce((s,c)=>s+(c.itens[p]?.qtd||0)*(c.itens[p]?.preco||0),0);
+let v=pagas.reduce(
+    (s,c)=>s+(c.itens[p]?.qtd||0)*centavos(c.itens[p]?.preco||0),0
+);
 let n=p==="Agua"?"Água":p==="Refri"?"Refrigerante":p;
-h+='<div class="item"><span>'+n+' - '+q+' unidades</span><strong>'+dinheiro(v)+'</strong></div>';
+h+='<div class="item"><span>'+n+' - '+q+' unidades</span><strong>'+dinheiroCentavos(v)+'</strong></div>';
 }
 
 document.getElementById("vendasProdutos").innerHTML=h;
@@ -906,11 +927,11 @@ for(let p of produtos){
 let q=pagas.reduce((s,c)=>s+(c.itens[p]?.qtd||0),0);
 
 let vendido=pagas.reduce(
-(s,c)=>s+(c.itens[p]?.qtd||0)*(c.itens[p]?.preco||0),0
+    (s,c)=>s+(c.itens[p]?.qtd||0)*centavos(c.itens[p]?.preco||0),0
 );
 
-let custo=pagas.reduce((s,c)=>
- s+(c.itens[p]?.qtd||0)*(c.itens[p]?.custo ?? custos[p]),0
+let custo=pagas.reduce(
+    (s,c)=>s+(c.itens[p]?.qtd||0)*centavos(c.itens[p]?.custo ?? custos[p]),0
 );
 
 let lucro=vendido-custo;
@@ -923,21 +944,20 @@ lucroHtml+=`
 <div class="item">
 <div>
 <strong>${n}</strong>
-<div class="muted">Vendido: ${dinheiro(vendido)} | Custo: ${dinheiro(custo)}</div>
+<div class="muted">Vendido: ${dinheiroCentavos(vendido)} | Custo: ${dinheiroCentavos(custo)}</div>
 </div>
-<strong>${dinheiro(lucro)}</strong>
+<strong>${dinheiroCentavos(lucro)}</strong>
 </div>
 `;
 }
 
-document.getElementById("custoDia").textContent=dinheiro(custoTotal);
-document.getElementById("lucroDia").textContent=dinheiro(soma-custoTotal);
+document.getElementById("custoDia").textContent=dinheiroCentavos(custoTotal);
+document.getElementById("lucroDia").textContent=dinheiroCentavos(soma-custoTotal);
 document.getElementById("lucroPorBebida").innerHTML=lucroHtml;
-document.getElementById("totalDespesas").textContent=dinheiro(totalDespesas);
+document.getElementById("totalDespesas").textContent=dinheiroCentavos(totalDespesas);
 
 document.getElementById("lucroFinal").textContent=
-    dinheiro(soma-custoTotal-totalDespesas);
-
+    dinheiroCentavos(soma-custoTotal-totalDespesas);
 document.getElementById("listaDespesas").innerHTML=despesasDia.length?
     despesasDia.map(d=>`
         <div class="item">
@@ -966,9 +986,9 @@ let b=fim.getFullYear()+"-"+String(fim.getMonth()+1).padStart(2,"0")+"-"+String(
 
 let totalFim=banco.comandas.filter(c=>
 c.status==="paga"&&c.criada&&[a,b].includes(dataLocal(c.criada))
-).reduce((s,c)=>s+total(c),0);
+).reduce((s,c)=>s+totalCentavos(c),0);
 
-document.getElementById("totalFimSemana").textContent=dinheiro(totalFim);
+document.getElementById("totalFimSemana").textContent=dinheiroCentavos(totalFim);
 }
 
 function backup(){
