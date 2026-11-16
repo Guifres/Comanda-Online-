@@ -162,11 +162,41 @@ label{display:block;margin:12px 0 5px;font-size:13px;color:#66736b}
 <hr>
 
 <strong>Lucro por bebida</strong>
+
 <div id="lucroPorBebida"></div>
 </div>
 
 <div class="card">
+<strong>Despesas do dia</strong>
+<p class="muted">Registre gelo, copos e outros gastos.</p>
+
+<label>Descrição da despesa</label>
+<input id="descricaoDespesa" placeholder="Ex.: Gelo">
+
+<label>Valor gasto (R$)</label>
+<input id="valorDespesa" type="number" min="0.01" step="0.01" placeholder="Ex.: 20,00">
+
+<button class="btn full" onclick="adicionarDespesa()">Registrar despesa</button>
+
+<hr>
+
+<strong>Despesas registradas</strong>
+<div id="listaDespesas"></div>
+
+<div class="item">
+<strong>Total de despesas</strong>
+<strong id="totalDespesas">R$ 0,00</strong>
+</div>
+
+<div class="item">
+<strong>Lucro final após despesas</strong>
+<strong id="lucroFinal">R$ 0,00</strong>
+</div>
+</div>
+
+<div class="card">
 <strong>Fim de semana</strong>
+
 <label>Escolha o sábado</label>
 <input type="date" id="sabado" onchange="relatorio()">
 <div class="big" id="totalFimSemana">R$ 0,00</div>
