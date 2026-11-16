@@ -239,7 +239,12 @@ Refri:3.91
 };
 
 let usuario=null;
-let banco={precos:{Cerveja:0,Agua:0,Refri:0},produtos:{},comandas:[]};
+let banco={
+ precos:{Cerveja:0,Agua:0,Refri:0},
+ produtos:{},
+ comandas:[],
+ despesas:[]
+};
 let atual=null;
 
 function aviso(msg,erro=false){
@@ -399,6 +404,16 @@ pagamento:o.payment_method,
 pagaEm:o.paid_at
 };
 });
+
+let {data:despesas,error:e3}=await sb
+.from("expenses")
+.select("*")
+.eq("user_id",usuario.id)
+.order("expense_date",{ascending:false});
+
+if(e3)throw e3;
+
+banco.despesas=despesas||[];
 
 mostrar();
 relatorio();
