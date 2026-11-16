@@ -509,14 +509,18 @@ let c=banco.comandas.find(x=>x.id===atual);
 if(!c||c.status!=="aberta")return;
 
 let anterior=c.itens[p]?{...c.itens[p]}:null;
-let i=c.itens[p]||{qtd:0,preco:Number(banco.precos[p])};
+let i=c.itens[p]||{
+ qtd:0,
+ preco:Number(banco.precos[p]),
+ custo:Number(custos[p])
+};
 
 // Atualiza a tela imediatamente
-c.itens[p]={qtd:i.qtd+1,preco:i.preco};
+c.itens[p]={qtd:i.qtd+1,preco:i.preco,custo:i.custo};
 mostrar();
 
 try{
-await salvarItem(c,p,i.qtd+1,i.preco);
+await salvarItem(c,p,i.qtd+1,i.preco,i.custo);
 }catch(e){
 if(anterior)c.itens[p]=anterior;
 else delete c.itens[p];
@@ -539,13 +543,13 @@ let novaQtd=anterior.qtd+n;
 if(novaQtd<=0){
 delete c.itens[p];
 }else{
-c.itens[p]={qtd:novaQtd,preco:anterior.preco};
+c.itens[p]={qtd:novaQtd,preco:anterior.preco,custo:anterior.custo};
 }
 
 mostrar();
 
 try{
-await salvarItem(c,p,novaQtd,anterior.preco);
+await salvarItem(c,p,novaQtd,anterior.preco,anterior.custo);
 }catch(e){
 c.itens[p]=anterior;
 mostrar();
