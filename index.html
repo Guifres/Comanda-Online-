@@ -712,6 +712,58 @@ await carregarDados();
 alert("Preços salvos na nuvem!");
 }
 
+
+async function adicionarDespesa(){
+    let descricao=document.getElementById("descricaoDespesa").value.trim();
+    let valor=Number(document.getElementById("valorDespesa").value);
+    let data=document.getElementById("dataRelatorio").value||dataHoje();
+
+    if(!descricao){
+        alert("Digite a descrição da despesa.");
+        return;
+    }
+
+    if(!Number.isFinite(valor)||valor<=0){
+        alert("Digite um valor válido.");
+        return;
+    }
+
+    let {error}=await sb.from("expenses").insert({
+        user_id:usuario.id,
+        description:descricao,
+        amount:valor,
+        expense_date:data
+    });
+
+    if(error){
+        alert("Erro ao registrar despesa: "+error.message);
+        return;
+    }
+
+    document.getElementById("descricaoDespesa").value="";
+    document.getElementById("valorDespesa").value="";
+
+    alert("Despesa registrada!");
+    await carregarDados();
+}
+
+async function excluirDespesa(id){
+    if(!confirm("Deseja excluir esta despesa?"))return;
+
+    let {error}=await sb.from("expenses")
+        .delete()
+        .eq("id",id)
+        .eq("user_id",usuario.id);
+
+    if(error){
+        alert("Erro ao excluir: "+error.message);
+        return;
+    }
+
+    await carregarDados();
+}
+
+
 function relatorio(){
 if(!usuario)return;
 
@@ -723,6 +775,12 @@ c.status==="paga"&&c.criada&&dataLocal(c.criada)===data
 );
 
 let soma=pagas.reduce((s,c)=>s+total(c),0);
+
+let despesasDia=banco.despesas.filter(d=>d.expense_date===data);
+
+let totalDespesas=despesasDia.reduce(
+    (s,d)=>s+Number(d.amount),0
+);
 
 
 let listaVendas=document.getElementById("listaVendasDia");
@@ -797,6 +855,22 @@ lucroHtml+=`
 document.getElementById("custoDia").textContent=dinheiro(custoTotal);
 document.getElementById("lucroDia").textContent=dinheiro(soma-custoTotal);
 document.getElementById("lucroPorBebida").innerHTML=lucroHtml;
+document.getElementById("totalDespesas").textContent=dinheiro(totalDespesas);
+
+document.getElementById("lucroFinal").textContent=
+    dinheiro(soma-custoTotal-totalDespesas);
+
+document.getElementById("listaDespesas").innerHTML=despesasDia.length?
+    despesasDia.map(d=>`
+        <div class="item">
+            <div>
+                <strong>${esc(d.description)}</strong>
+                <div class="muted">${dinheiro(d.amount)}</div>
+            </div>
+            <button class="btn secondary" onclick="excluirDespesa('${d.id}')">Excluir</button>
+        </div>
+    `).join("")
+    :'<div class="empty">Nenhuma despesa nesta data.</div>';
 
 let sab=document.getElementById("sabado").value||data;
 document.getElementById("sabado").value=sab;
